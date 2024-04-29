@@ -2,6 +2,8 @@ import styles from "../../styles/common/navbar.module.css";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { SlHome } from "react-icons/sl";
+import { FaGamepad } from "react-icons/fa";
+import { MdOutlineLeaderboard } from "react-icons/md";
 
 NameLogo.propTypes = {
   title: PropTypes.string,
@@ -36,6 +38,12 @@ function MenuSection() {
   return (
     <ul className={styles["nav-menu-list"]}>
       <NavItem url="/" label={"Home"} icon={<SlHome />} />
+      <NavItem url="/game" label={"Game"} icon={<FaGamepad />} />
+      <NavItem
+        url="/leaderboard"
+        label={"Leaderboard"}
+        icon={<MdOutlineLeaderboard />}
+      />
     </ul>
   );
 }

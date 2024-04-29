@@ -3,6 +3,8 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import ErrorPage from "./common/error";
 import Home from "./routes/home";
+import Game from "./routes/game";
+import Leaderboard from "./routes/leaderboard";
 import Navbar from "./common/navbar";
 
 function Content() {
@@ -34,6 +36,14 @@ function App() {
         {
           index: true,
           element: <Home />,
+        },
+        {
+          path: "/game",
+          element: <Game />,
+        },
+        {
+          path: "/leaderboard",
+          element: <Leaderboard />,
         },
       ],
     },
