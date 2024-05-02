@@ -1,9 +1,44 @@
 import styles from "../../styles/routes/game.module.css";
 import useMousePosition from "../../utils/mouseUtils";
-import { useEffect, useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { getNormalizedPosition } from "../../utils/imageUtils";
+import { useGetImage } from "../../domain/charImageUseCase";
+import PropTypes from "prop-types";
 
-function ContextMenu({ showMenu, xPos, yPos }) {
+import ErrorPage from "../common/error";
+import LoadingPage from "../common/loading";
+
+ContextMenuItem.propTypes = {
+  character: PropTypes.object,
+};
+
+ContextMenu.propTypes = {
+  showMenu: PropTypes.bool,
+  xPos: PropTypes.number,
+  yPos: PropTypes.number,
+  characters: PropTypes.object,
+};
+
+TargetBox.propTypes = {
+  targetStyle: PropTypes.object,
+};
+
+function ContextMenuItem({ character }) {
+  return (
+    <li className={styles["context-item"]}>
+      <div className={styles["context-item-content"]}>
+        <img
+          src={character.char_profile_url}
+          alt={character.char_name}
+          className={styles["context-item-profile"]}
+        />
+        <div>{character.char_name}</div>
+      </div>
+    </li>
+  );
+}
+
+function ContextMenu({ showMenu, xPos, yPos, characters }) {
   if (!showMenu) return null;
   return (
     <div
@@ -14,9 +49,15 @@ function ContextMenu({ showMenu, xPos, yPos }) {
       }}
     >
       <ul className={styles["context-content"]}>
-        <li className={styles["context-item"]}>Menu 1</li>
-        <li className={styles["context-item"]}>Menu 2</li>
-        <li className={styles["context-item"]}>Menu 3</li>
+        {characters.length > 0 ? (
+          characters.map((character) => {
+            return (
+              <ContextMenuItem key={character._id} character={character} />
+            );
+          })
+        ) : (
+          <li>no characters</li>
+        )}
       </ul>
     </div>
   );
@@ -39,13 +80,17 @@ export default function Game() {
     top: `0px`,
     left: `0px`,
   });
+  const { charImage, characters, error, loading } = useGetImage();
+
+  if (error) return <ErrorPage errorMsg={error.message} />;
+  if (loading) return <LoadingPage />;
 
   return (
     <div className={styles["game-layout"]}>
       <div>{JSON.stringify(localCoords)}</div>
       <div>
         {JSON.stringify(
-          getNormalizedPosition(500, 500, localCoords.x, localCoords.y)
+          getNormalizedPosition(960, 678.4, localCoords.x, localCoords.y)
         )}
       </div>
 
@@ -73,8 +118,11 @@ export default function Game() {
           showMenu={menuState.showMenu}
           xPos={menuState.xPos}
           yPos={menuState.yPos}
+          characters={characters}
         />
         <TargetBox targetStyle={targetStyle} />
+
+        <img src={charImage.image_url} className={styles["image"]} />
       </div>
     </div>
   );

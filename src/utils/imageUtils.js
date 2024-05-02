@@ -1,3 +1,5 @@
 export function getNormalizedPosition(imageWidth, imageHeight, posX, posY) {
-  return { normalX: posX / imageWidth, normalY: posY / imageHeight };
+  let normalX = (posX / imageWidth).toFixed(3);
+  let normalY = (posY / imageHeight).toFixed(3);
+  return { normalX: normalX, normalY: normalY };
 }
