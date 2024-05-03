@@ -1,0 +1,40 @@
+.context-menu {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  z-index: 10;
+}
+
+.context-content {
+  padding: 0;
+  background-color: #18181b;
+  opacity: 0.8;
+  border-radius: 0.5em;
+  list-style: none;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.context-item {
+  cursor: pointer;
+  padding: 0.5em;
+  transition: background-color 0.2s ease;
+}
+
+.context-item-content {
+  display: flex;
+  gap: 1em;
+}
+
+.context-item-profile {
+  width: 24px;
+  height: 24px;
+}
+
+.context-item:nth-child(odd) {
+  background-color: #27272a;
+}
+
+.context-item:hover {
+  background-color: #44403c;
+}

@@ -36,6 +36,10 @@ export const createPlayer = async ({ player_name }) => {
   await fetch(`${playerUri}`, {
     method: "POST",
     mode: "cors",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ player_name }),
   })
     .then((response) => {
@@ -59,6 +63,10 @@ export const updatePlayer = async ({ end_time }) => {
   await fetch(`${playerUri}`, {
     method: "PUT",
     mode: "cors",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ end_time }),
   })
     .then((response) => {

@@ -39,3 +39,36 @@ export const useGetImage = () => {
 
   return { charImage, characters, error, loading };
 };
+
+export const validatePosition = async ({ char_x, char_y }) => {
+  let character = null;
+  let message = null;
+  let error = null;
+
+  await fetch(`${charImageUri}/663238db21ca549577e2bac9/validate-position`, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ char_x, char_y }),
+  })
+    .then((response) => {
+      if (response.status >= 400) {
+        throw new Error("server error");
+      }
+      return response.json();
+    })
+    .then((response) => {
+      if (response.character !== undefined) {
+        character = response.character;
+      }
+      if (response.message !== undefined) {
+        message = response.message;
+      }
+    })
+    .catch((err) => (error = err));
+
+  return { character, message, error };
+};
