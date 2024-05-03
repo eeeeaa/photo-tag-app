@@ -1,16 +1,18 @@
 import styles from "../../styles/routes/game.module.css";
 import useMousePosition from "../../utils/mouseUtils";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getNormalizedPosition } from "../../utils/imageUtils";
 import { useGetImage } from "../../domain/charImageUseCase";
 import PropTypes from "prop-types";
-
+import { createPlayer, useUpdatePlayer } from "../../domain/playerUseCase";
 import ErrorPage from "../common/error";
 import LoadingPage from "../common/loading";
 import { Toast } from "../common/toast";
 import { ContextMenu } from "../common/contextMenu";
 import { GameContext, MenuContext } from "../../utils/contextProvider";
 import { GiPositionMarker } from "react-icons/gi";
+import { calculateTimeSpent } from "../../utils/dateUtils";
 
 TargetBox.propTypes = {
   targetStyle: PropTypes.object,
@@ -80,7 +82,7 @@ function ActiveGame() {
   const { WIDTH_PX, HEIGHT_PX, charImage, characters, markers } =
     useContext(GameContext);
   return (
-    <>
+    <div className={styles["game-layout"]}>
       <div>{JSON.stringify(localCoords)}</div>
       <div>
         {JSON.stringify(
@@ -132,31 +134,72 @@ function ActiveGame() {
 
         <img src={charImage.image_url} className={styles["image"]} />
       </div>
-    </>
+    </div>
   );
 }
 
 function GameStart() {
-  //TODO start game button, create player
-  const { setGameState } = useContext(GameContext);
-  const handleClick = () => {
-    setGameState(<ActiveGame />);
+  const { setGameState, setCurrentPlayer } = useContext(GameContext);
+  const [name, setName] = useState("player");
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { player, error } = await createPlayer({ player_name: name });
+      if (error != null) {
+        setGameState(<ErrorPage errorMsg={error.message} />);
+        return;
+      }
+      setGameState(<ActiveGame />);
+      setCurrentPlayer(player);
+    } catch (error) {
+      navigate("/error");
+    }
   };
   return (
-    <div>
-      <button onClick={handleClick}>Start game</button>
+    <div className={styles["game-layout"]}>
+      <div className={styles["start-form-layout"]}>
+        <form onSubmit={handleSubmit} className={styles["start-form"]}>
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+          />
+          <button type="submit">Start game</button>
+        </form>
+      </div>
     </div>
   );
 }
 
 export function GameEnd() {
-  //TODO end game, update player time, show score
-  return <div>Game end</div>;
+  const { currentPlayer } = useContext(GameContext);
+  const date = new Date();
+
+  const { player, error, loading } = useUpdatePlayer({
+    playerId: currentPlayer._id,
+    end_time: date.toISOString(),
+  });
+
+  if (error) return <ErrorPage errorMsg={error.message} />;
+  if (loading) return <LoadingPage />;
+  return (
+    <div className={styles["game-layout"]}>
+      <h2>{player.player_name}</h2>
+      <div>
+        time Spent: {calculateTimeSpent(player.start_time, player.end_time)}
+      </div>
+    </div>
+  );
 }
 
 export default function Game() {
   const [markers, setMarkers] = useState([]);
   const { charImage, characters, error, loading } = useGetImage();
+  const [currentPlayer, setCurrentPlayer] = useState({});
   const [gameState, setGameState] = useState(<GameStart />);
 
   const WIDTH_PX = 960;
@@ -174,11 +217,13 @@ export default function Game() {
         setGameState,
         markers,
         setMarkers,
+        currentPlayer,
+        setCurrentPlayer,
         WIDTH_PX,
         HEIGHT_PX,
       }}
     >
-      <div className={styles["game-layout"]}>{gameState}</div>
+      {gameState}
     </GameContext.Provider>
   );
 }

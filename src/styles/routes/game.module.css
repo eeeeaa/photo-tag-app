@@ -56,6 +56,12 @@
   animation: markerFadeIn 0.2s ease;
 }
 
+.start-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
 @keyframes markerFadeIn {
   from {
     bottom: 24px;

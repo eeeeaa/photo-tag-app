@@ -56,11 +56,43 @@ export const createPlayer = async ({ player_name }) => {
   return { player, error };
 };
 
-export const updatePlayer = async ({ end_time }) => {
+export const useUpdatePlayer = ({ playerId, end_time }) => {
+  const [player, setPlayer] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${playerUri}/${playerId}`, {
+      method: "PUT",
+      mode: "cors",
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ end_time }),
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error("server error");
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setPlayer(response.updatedPlayer);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { player, error, loading };
+};
+
+export const updatePlayer = async ({ playerId, end_time }) => {
   let player = null;
   let error = null;
 
-  await fetch(`${playerUri}`, {
+  await fetch(`${playerUri}/${playerId}`, {
     method: "PUT",
     mode: "cors",
     headers: {
