@@ -2,9 +2,10 @@ import { useContext } from "react";
 import { getNormalizedPosition } from "../../utils/imageUtils";
 import { validatePosition } from "../../domain/charImageUseCase";
 import PropTypes from "prop-types";
-import { GameContext } from "../../utils/contextProvider";
+import { GameContext, MenuContext } from "../../utils/contextProvider";
 import styles from "../../styles/common/contextMenu.module.css";
 import { useNavigate } from "react-router-dom";
+import { GameEnd } from "../routes/game";
 
 ContextMenuItem.propTypes = {
   character: PropTypes.object,
@@ -21,8 +22,30 @@ ContextMenu.propTypes = {
 
 function ContextMenuItem({ character, xPos, yPos }) {
   const navigate = useNavigate();
-  const { showToast, placeMarker, WIDTH_PX, HEIGHT_PX } =
+  const { markers, setMarkers, WIDTH_PX, HEIGHT_PX, characters, setGameState } =
     useContext(GameContext);
+  const { toastMsg, setToastMsg } = useContext(MenuContext);
+
+  const checkGameEnd = (currentMarkers) => {
+    if (currentMarkers.length >= characters.length) {
+      setGameState(<GameEnd />);
+    }
+  };
+
+  const showToast = (message) => {
+    if (toastMsg.length === 0) {
+      setToastMsg(message);
+    }
+  };
+  const placeMarker = (posX, posY) => {
+    let newMarkers = [...markers];
+    if (!markers.includes({ posX, posY })) {
+      newMarkers.push({ posX, posY });
+    }
+    setMarkers(newMarkers);
+    checkGameEnd(newMarkers);
+  };
+
   const handleMenuClick = async () => {
     const { normalX, normalY } = getNormalizedPosition(
       WIDTH_PX,

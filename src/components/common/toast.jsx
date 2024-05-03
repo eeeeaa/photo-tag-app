@@ -13,7 +13,7 @@ export function Toast({ message, setToastMsg }) {
     setTimeout(() => {
       setShow(`${styles["snackbar"]}`);
       setToastMsg("");
-    }, 3000);
+    }, 1500);
   }, [setToastMsg]);
   return (
     <div id="snackbar" className={show}>

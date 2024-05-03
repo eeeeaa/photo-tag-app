@@ -1,6 +1,6 @@
 import styles from "../../styles/routes/game.module.css";
 import useMousePosition from "../../utils/mouseUtils";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { getNormalizedPosition } from "../../utils/imageUtils";
 import { useGetImage } from "../../domain/charImageUseCase";
 import PropTypes from "prop-types";
@@ -9,7 +9,7 @@ import ErrorPage from "../common/error";
 import LoadingPage from "../common/loading";
 import { Toast } from "../common/toast";
 import { ContextMenu } from "../common/contextMenu";
-import { GameContext } from "../../utils/contextProvider";
+import { GameContext, MenuContext } from "../../utils/contextProvider";
 import { GiPositionMarker } from "react-icons/gi";
 
 TargetBox.propTypes = {
@@ -63,8 +63,8 @@ function Markers({ markers }) {
   );
 }
 
-export default function Game() {
-  const { globalCoords, localCoords, handleMouseMove } = useMousePosition();
+function ActiveGame() {
+  const { localCoords, handleMouseMove } = useMousePosition();
   const [menuState, setMenuState] = useState({
     showMenu: false,
     xPos: 0,
@@ -76,85 +76,109 @@ export default function Game() {
     top: `0px`,
     left: `0px`,
   });
-  const [markers, setMarkers] = useState([]);
-  const { charImage, characters, error, loading } = useGetImage();
   const [toastMsg, setToastMsg] = useState("");
-
-  const WIDTH_PX = 960;
-  const HEIGHT_PX = 678.4;
-
-  const showToast = (message) => {
-    if (toastMsg.length === 0) {
-      setToastMsg(message);
-    }
-  };
-  const placeMarker = (posX, posY) => {
-    let newMarkers = [...markers];
-    if (!markers.includes({ posX, posY })) {
-      newMarkers.push({ posX, posY });
-    }
-
-    setMarkers(newMarkers);
-  };
-
-  if (error) return <ErrorPage errorMsg={error.message} />;
-  if (loading) return <LoadingPage />;
-
+  const { WIDTH_PX, HEIGHT_PX, charImage, characters, markers } =
+    useContext(GameContext);
   return (
-    <GameContext.Provider
-      value={{ showToast, placeMarker, WIDTH_PX, HEIGHT_PX }}
-    >
-      <div className={styles["game-layout"]}>
-        <div>{JSON.stringify(localCoords)}</div>
-        <div>
-          {JSON.stringify(
-            getNormalizedPosition(
-              WIDTH_PX,
-              HEIGHT_PX,
-              localCoords.x,
-              localCoords.y
-            )
-          )}
-        </div>
+    <>
+      <div>{JSON.stringify(localCoords)}</div>
+      <div>
+        {JSON.stringify(
+          getNormalizedPosition(
+            WIDTH_PX,
+            HEIGHT_PX,
+            localCoords.x,
+            localCoords.y
+          )
+        )}
+      </div>
 
-        <div
-          onClick={(e) => {
-            if (e.target.getAttribute("id") === "game-image-area")
-              handleMouseMove(e, (local, global) => {
-                setTargetStyle({
-                  display: "flex",
-                  position: `absolute`,
-                  top: `${local.y - 12}px`,
-                  left: `${local.x - 12}px`,
-                });
-                setMenuState({
-                  showMenu: true,
-                  xPos: local.x,
-                  yPos: local.y,
-                });
+      <div
+        onClick={(e) => {
+          if (e.target.getAttribute("id") === "game-image-area")
+            handleMouseMove(e, (local) => {
+              setTargetStyle({
+                display: "flex",
+                position: `absolute`,
+                top: `${local.y - 12}px`,
+                left: `${local.x - 12}px`,
               });
-          }}
-          className={styles["image-box"]}
-          id="game-image-area"
-        >
+              setMenuState({
+                showMenu: true,
+                xPos: local.x,
+                yPos: local.y,
+              });
+            });
+        }}
+        className={styles["image-box"]}
+        id="game-image-area"
+      >
+        <MenuContext.Provider value={{ toastMsg, setToastMsg }}>
           <ContextMenu
             showMenu={menuState.showMenu}
             xPos={menuState.xPos}
             yPos={menuState.yPos}
             characters={characters}
           />
-          <TargetBox targetStyle={targetStyle} />
-          <Markers markers={markers} />
+        </MenuContext.Provider>
+        <TargetBox targetStyle={targetStyle} />
+        <Markers markers={markers} />
 
-          {toastMsg.length > 0 ? (
-            <Toast message={toastMsg} setToastMsg={setToastMsg} />
-          ) : (
-            <></>
-          )}
+        {toastMsg.length > 0 ? (
+          <Toast message={toastMsg} setToastMsg={setToastMsg} />
+        ) : (
+          <></>
+        )}
 
-          <img src={charImage.image_url} className={styles["image"]} />
-        </div>
+        <img src={charImage.image_url} className={styles["image"]} />
       </div>
+    </>
+  );
+}
+
+function GameStart() {
+  //TODO start game button, create player
+  const { setGameState } = useContext(GameContext);
+  const handleClick = () => {
+    setGameState(<ActiveGame />);
+  };
+  return (
+    <div>
+      <button onClick={handleClick}>Start game</button>
+    </div>
+  );
+}
+
+export function GameEnd() {
+  //TODO end game, update player time, show score
+  return <div>Game end</div>;
+}
+
+export default function Game() {
+  const [markers, setMarkers] = useState([]);
+  const { charImage, characters, error, loading } = useGetImage();
+  const [gameState, setGameState] = useState(<GameStart />);
+
+  const WIDTH_PX = 960;
+  const HEIGHT_PX = 678.4;
+
+  if (error) return <ErrorPage errorMsg={error.message} />;
+  if (loading) return <LoadingPage />;
+
+  return (
+    <GameContext.Provider
+      value={{
+        charImage,
+        characters,
+        gameState,
+        setGameState,
+        markers,
+        setMarkers,
+        WIDTH_PX,
+        HEIGHT_PX,
+      }}
+    >
+      <div className={styles["game-layout"]}>{gameState}</div>
     </GameContext.Provider>
   );
 }
