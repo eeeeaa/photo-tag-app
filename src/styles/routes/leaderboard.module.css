@@ -1,0 +1,27 @@
+.leaderboard-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  list-style: none;
+}
+
+.player-item {
+  font-size: larger;
+  display: grid;
+  justify-items: center;
+  grid-template: 1fr / 1fr 1fr;
+
+  .player-name {
+    font-weight: 600;
+  }
+
+  .time-spent {
+    font-weight: 400;
+    font-style: italic;
+  }
+}

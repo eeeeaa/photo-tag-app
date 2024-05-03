@@ -1,6 +1,6 @@
 import styles from "../../styles/routes/game.module.css";
 import useMousePosition from "../../utils/mouseUtils";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { getNormalizedPosition } from "../../utils/imageUtils";
 import { useGetImage } from "../../domain/charImageUseCase";
