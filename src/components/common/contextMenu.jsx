@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { getNormalizedPosition } from "../../utils/imageUtils";
 import { validatePosition } from "../../domain/charImageUseCase";
 import PropTypes from "prop-types";
 import { GameContext, MenuContext } from "../../utils/contextProvider";
@@ -20,11 +19,20 @@ ContextMenu.propTypes = {
   characters: PropTypes.array,
 };
 
-function ContextMenuItem({ character, xPos, yPos }) {
+TargetBox.propTypes = {
+  targetStyle: PropTypes.object,
+};
+
+export function TargetBox({ targetStyle }) {
+  return <div className={styles["target-box"]} style={targetStyle}></div>;
+}
+
+function ContextMenuItem({ character }) {
   const navigate = useNavigate();
-  const { markers, setMarkers, WIDTH_PX, HEIGHT_PX, characters, setGameState } =
+  const { markers, setMarkers, setGameState, charImage } =
     useContext(GameContext);
-  const { toastMsg, setToastMsg } = useContext(MenuContext);
+  const { toastMsg, setToastMsg, characters, normalX, normalY } =
+    useContext(MenuContext);
 
   const checkGameEnd = (currentMarkers) => {
     if (currentMarkers.length >= characters.length) {
@@ -37,24 +45,18 @@ function ContextMenuItem({ character, xPos, yPos }) {
       setToastMsg(message);
     }
   };
-  const placeMarker = (posX, posY) => {
+  const placeMarker = () => {
     let newMarkers = [...markers];
-    if (!markers.includes({ posX, posY })) {
-      newMarkers.push({ posX, posY });
+    if (!markers.includes({ normalX, normalY })) {
+      newMarkers.push({ normalX, normalY });
     }
     setMarkers(newMarkers);
     checkGameEnd(newMarkers);
   };
 
   const handleMenuClick = async () => {
-    const { normalX, normalY } = getNormalizedPosition(
-      WIDTH_PX,
-      HEIGHT_PX,
-      xPos,
-      yPos
-    );
-
     const { character, message, error } = await validatePosition({
+      charImageId: charImage._id,
       char_x: normalX,
       char_y: normalY,
     });
@@ -63,7 +65,7 @@ function ContextMenuItem({ character, xPos, yPos }) {
       return;
     }
     if (character != null) {
-      placeMarker(xPos, yPos);
+      placeMarker();
     } else if (message != null) {
       showToast(message);
     }
@@ -82,26 +84,22 @@ function ContextMenuItem({ character, xPos, yPos }) {
   );
 }
 
-export function ContextMenu({ showMenu, xPos, yPos, characters }) {
+export function ContextMenu({ showMenu }) {
+  const { characters, posX, posY } = useContext(MenuContext);
   if (!showMenu) return null;
   return (
     <div
       className={styles["context-menu"]}
       style={{
-        top: `${yPos + 24}px`,
-        left: `${xPos + 24}px`,
+        top: `${posY}px`,
+        left: `${posX + 24}px`,
       }}
     >
       <ul className={styles["context-content"]}>
         {characters.length > 0 ? (
           characters.map((character) => {
             return (
-              <ContextMenuItem
-                key={character._id}
-                character={character}
-                xPos={xPos}
-                yPos={yPos}
-              />
+              <ContextMenuItem key={character._id} character={character} />
             );
           })
         ) : (

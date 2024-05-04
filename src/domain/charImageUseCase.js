@@ -3,6 +3,58 @@ import { useEffect } from "react";
 
 const charImageUri = `${import.meta.env.VITE_PHOTO_TAG_API_URL}/char-images`;
 
+export const useGetFirstImage = () => {
+  const [charImage, setCharImage] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  //get specific image for now
+  useEffect(() => {
+    fetch(`${charImageUri}`, {
+      method: "GET",
+      mode: "cors",
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error("server error");
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setCharImage(response.charImages[0]);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { charImage, error, loading };
+};
+
+export const useGetCharacters = (charImageId) => {
+  const [characters, setCharacters] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    fetch(`${charImageUri}/${charImageId}/characters`, {
+      method: "GET",
+      mode: "cors",
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error("server error");
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setCharacters(response.characters);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { characters, error, loading };
+};
+
 export const useGetImage = () => {
   const [characters, setCharacters] = useState([]);
   const [charImage, setCharImage] = useState({});
@@ -40,12 +92,12 @@ export const useGetImage = () => {
   return { charImage, characters, error, loading };
 };
 
-export const validatePosition = async ({ char_x, char_y }) => {
+export const validatePosition = async ({ charImageId, char_x, char_y }) => {
   let character = null;
   let message = null;
   let error = null;
 
-  await fetch(`${charImageUri}/663238db21ca549577e2bac9/validate-position`, {
+  await fetch(`${charImageUri}/${charImageId}/validate-position`, {
     method: "POST",
     mode: "cors",
     headers: {

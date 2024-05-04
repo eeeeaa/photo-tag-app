@@ -38,3 +38,12 @@
 .context-item:hover {
   background-color: #44403c;
 }
+
+.target-box {
+  z-index: -10;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #4ade80;
+  transition: all 0.2s;
+}
