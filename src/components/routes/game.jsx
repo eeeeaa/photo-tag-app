@@ -4,7 +4,6 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getNormalizedPosition, getRawPosition } from "../../utils/imageUtils";
 import {
-  useGetFirstImage,
   useGetCharacters,
   useGetCharImages,
 } from "../../domain/charImageUseCase";
@@ -40,6 +39,11 @@ Target.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
   characters: PropTypes.array,
+};
+
+CharImageItem.propTypes = {
+  charImage: PropTypes.object,
+  handleSelectImage: PropTypes.func,
 };
 
 function Target({
@@ -304,21 +308,21 @@ function GameStart() {
           <button type="submit">Start game</button>
         </form>
         <button onClick={handlePracticeClick}>Practice</button>
-        <div className={styles["char-image-list"]}>
-          {charImages.length > 0 ? (
-            charImages.map((item) => {
-              return (
-                <CharImageItem
-                  key={item._id}
-                  charImage={item}
-                  handleSelectImage={handleSelectImage}
-                />
-              );
-            })
-          ) : (
-            <div>No games</div>
-          )}
-        </div>
+      </div>
+      <div className={styles["char-image-list"]}>
+        {charImages.length > 0 ? (
+          charImages.map((item) => {
+            return (
+              <CharImageItem
+                key={item._id}
+                charImage={item}
+                handleSelectImage={handleSelectImage}
+              />
+            );
+          })
+        ) : (
+          <div>No games</div>
+        )}
       </div>
     </div>
   );

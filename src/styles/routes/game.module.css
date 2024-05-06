@@ -41,6 +41,8 @@
 }
 
 .char-image-list {
+  padding: 1em;
+  width: 50%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   align-items: center;

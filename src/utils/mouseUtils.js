@@ -6,9 +6,10 @@ const useMousePosition = () => {
 
   const handleMouseMove = (event, cb = null) => {
     // 👇️ Get the mouse position relative to the element
+    const rect = event.target.getBoundingClientRect();
     let local = {
-      x: event.clientX - event.target.offsetLeft,
-      y: event.clientY - event.target.offsetTop,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
     };
     let global = {
       x: event.clientX,

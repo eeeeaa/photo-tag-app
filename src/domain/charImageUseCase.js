@@ -3,32 +3,6 @@ import { useEffect } from "react";
 
 const charImageUri = `${import.meta.env.VITE_PHOTO_TAG_API_URL}/char-images`;
 
-export const useGetFirstImage = () => {
-  const [charImage, setCharImage] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`${charImageUri}`, {
-      method: "GET",
-      mode: "cors",
-    })
-      .then((response) => {
-        if (response.status >= 400) {
-          throw new Error("server error");
-        }
-        return response.json();
-      })
-      .then((response) => {
-        setCharImage(response.charImages[0]);
-      })
-      .catch((error) => setError(error))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { charImage, error, loading };
-};
-
 export const useGetCharImages = () => {
   const [charImages, setCharImages] = useState([]);
   const [error, setError] = useState(null);
