@@ -8,7 +8,6 @@ export const useGetFirstImage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  //get specific image for now
   useEffect(() => {
     fetch(`${charImageUri}`, {
       method: "GET",
@@ -28,6 +27,32 @@ export const useGetFirstImage = () => {
   }, []);
 
   return { charImage, error, loading };
+};
+
+export const useGetCharImages = () => {
+  const [charImages, setCharImages] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${charImageUri}`, {
+      method: "GET",
+      mode: "cors",
+    })
+      .then((response) => {
+        if (response.status >= 400) {
+          throw new Error("server error");
+        }
+        return response.json();
+      })
+      .then((response) => {
+        setCharImages(response.charImages);
+      })
+      .catch((error) => setError(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { charImages, error, loading };
 };
 
 export const useGetCharacters = (charImageId) => {
@@ -53,43 +78,6 @@ export const useGetCharacters = (charImageId) => {
   }, []);
 
   return { characters, error, loading };
-};
-
-export const useGetImage = () => {
-  const [characters, setCharacters] = useState([]);
-  const [charImage, setCharImage] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  //get specific image for now
-  useEffect(() => {
-    Promise.all([
-      fetch(`${charImageUri}/663238db21ca549577e2bac9`, {
-        method: "GET",
-        mode: "cors",
-      }),
-      fetch(`${charImageUri}/663238db21ca549577e2bac9/characters`, {
-        method: "GET",
-        mode: "cors",
-      }),
-    ])
-      .then((responses) => {
-        for (const response of responses) {
-          if (response.status >= 400) {
-            throw new Error("server error");
-          }
-        }
-        return Promise.all(responses.map((response) => response.json()));
-      })
-      .then((responses) => {
-        setCharImage(responses[0].charImage);
-        setCharacters(responses[1].characters);
-      })
-      .catch((error) => setError(error))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { charImage, characters, error, loading };
 };
 
 export const validatePosition = async ({ charImageId, char_x, char_y }) => {

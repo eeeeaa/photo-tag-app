@@ -6,6 +6,7 @@ import { getNormalizedPosition, getRawPosition } from "../../utils/imageUtils";
 import {
   useGetFirstImage,
   useGetCharacters,
+  useGetCharImages,
 } from "../../domain/charImageUseCase";
 import PropTypes from "prop-types";
 import { createPlayer, useUpdatePlayer } from "../../domain/playerUseCase";
@@ -226,10 +227,31 @@ function ActiveGame() {
   );
 }
 
+function CharImageItem({ charImage, handleSelectImage }) {
+  return (
+    <div
+      className={styles["char-image-item"]}
+      onClick={() => handleSelectImage(charImage)}
+    >
+      <img
+        className={styles["char-image-content"]}
+        src={charImage.image_url}
+        alt={charImage._id}
+      />
+    </div>
+  );
+}
+
 function GameStart() {
-  const { setGameState, setCurrentPlayer, setGameMode } =
-    useContext(GameContext);
+  const {
+    charImages,
+    setGameState,
+    setCurrentPlayer,
+    setGameMode,
+    setCharImage,
+  } = useContext(GameContext);
   const [name, setName] = useState("player");
+  const [toastMsg, setToastMsg] = useState("");
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -250,8 +272,25 @@ function GameStart() {
     setGameMode("PRACTICE");
     setGameState(<ActiveGame />);
   };
+
+  const handleSelectImage = (charImage) => {
+    setCharImage(charImage);
+    setToastMsg("Game selected");
+  };
+
+  useEffect(() => {
+    if (charImages.length > 0) {
+      setCharImage(charImages[0]);
+    }
+  }, [charImages, setCharImage]);
+
   return (
     <div className={styles["game-layout"]}>
+      {toastMsg.length > 0 ? (
+        <Toast message={toastMsg} setToastMsg={setToastMsg} />
+      ) : (
+        <></>
+      )}
       <div className={styles["start-form-layout"]}>
         <form onSubmit={handleSubmit} className={styles["start-form"]}>
           <label htmlFor="name">Name:</label>
@@ -265,6 +304,21 @@ function GameStart() {
           <button type="submit">Start game</button>
         </form>
         <button onClick={handlePracticeClick}>Practice</button>
+        <div className={styles["char-image-list"]}>
+          {charImages.length > 0 ? (
+            charImages.map((item) => {
+              return (
+                <CharImageItem
+                  key={item._id}
+                  charImage={item}
+                  handleSelectImage={handleSelectImage}
+                />
+              );
+            })
+          ) : (
+            <div>No games</div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -301,9 +355,10 @@ export function PracticeEnd() {
 
 export default function Game() {
   const [markers, setMarkers] = useState([]);
-  const { charImage, error, loading } = useGetFirstImage();
+  const { charImages, error, loading } = useGetCharImages();
 
   const [currentPlayer, setCurrentPlayer] = useState({});
+  const [charImage, setCharImage] = useState({});
   const [gameState, setGameState] = useState(<GameStart />);
   const [gameMode, setGameMode] = useState("REAL");
 
@@ -313,7 +368,9 @@ export default function Game() {
   return (
     <GameContext.Provider
       value={{
+        charImages,
         charImage,
+        setCharImage,
         gameState,
         setGameState,
         markers,
