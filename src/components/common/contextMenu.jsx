@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { GameContext, MenuContext } from "../../utils/contextProvider";
 import styles from "../../styles/common/contextMenu.module.css";
 import { useNavigate } from "react-router-dom";
-import { GameEnd } from "../routes/game";
+import { GameEnd, PracticeEnd } from "../routes/game";
 
 ContextMenuItem.propTypes = {
   character: PropTypes.object,
@@ -29,14 +29,18 @@ export function TargetBox({ targetStyle }) {
 
 function ContextMenuItem({ character }) {
   const navigate = useNavigate();
-  const { markers, setMarkers, setGameState, charImage } =
+  const { markers, setMarkers, setGameState, charImage, gameMode } =
     useContext(GameContext);
   const { toastMsg, setToastMsg, characters, normalX, normalY } =
     useContext(MenuContext);
 
   const checkGameEnd = (currentMarkers) => {
     if (currentMarkers.length >= characters.length) {
-      setGameState(<GameEnd />);
+      if (gameMode === "REAL") {
+        setGameState(<GameEnd />);
+      } else {
+        setGameState(<PracticeEnd />);
+      }
     }
   };
 

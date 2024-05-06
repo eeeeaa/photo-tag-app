@@ -17,6 +17,9 @@ import { GameContext, MenuContext } from "../../utils/contextProvider";
 import { GiPositionMarker } from "react-icons/gi";
 import { calculateTimeSpent } from "../../utils/dateUtils";
 import { TargetBox } from "../common/contextMenu";
+import { Timer } from "../common/timer";
+
+import { ImageLoader } from "../common/imageLoader";
 
 Markers.propTypes = {
   markers: PropTypes.array,
@@ -111,13 +114,7 @@ function Markers({ markers, width, height }) {
             marker.normalX,
             marker.normalY
           );
-          return (
-            <Marker
-              key={`${marker.posX}${marker.posY}`}
-              posX={posX}
-              posY={posY}
-            />
-          );
+          return <Marker key={crypto.randomUUID()} posX={posX} posY={posY} />;
         })
       ) : (
         <></>
@@ -181,6 +178,7 @@ function ActiveGame() {
         }
       }}
     >
+      <Timer />
       <div
         onClick={(e) => {
           if (e.target.getAttribute("id") === "game-image-area")
@@ -218,9 +216,9 @@ function ActiveGame() {
           <></>
         )}
 
-        <img
-          src={charImage.image_url}
-          className={styles["image"]}
+        <ImageLoader
+          url={charImage.image_url}
+          alt={charImage._id}
           ref={observedDiv}
         />
       </div>
@@ -229,7 +227,8 @@ function ActiveGame() {
 }
 
 function GameStart() {
-  const { setGameState, setCurrentPlayer } = useContext(GameContext);
+  const { setGameState, setCurrentPlayer, setGameMode } =
+    useContext(GameContext);
   const [name, setName] = useState("player");
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
@@ -240,11 +239,16 @@ function GameStart() {
         setGameState(<ErrorPage errorMsg={error.message} />);
         return;
       }
+      setGameMode("REAL");
       setGameState(<ActiveGame />);
       setCurrentPlayer(player);
     } catch (error) {
       navigate("/error");
     }
+  };
+  const handlePracticeClick = () => {
+    setGameMode("PRACTICE");
+    setGameState(<ActiveGame />);
   };
   return (
     <div className={styles["game-layout"]}>
@@ -260,6 +264,7 @@ function GameStart() {
           />
           <button type="submit">Start game</button>
         </form>
+        <button onClick={handlePracticeClick}>Practice</button>
       </div>
     </div>
   );
@@ -286,12 +291,21 @@ export function GameEnd() {
   );
 }
 
+export function PracticeEnd() {
+  return (
+    <div className={styles["game-layout"]}>
+      <h2>Practice finished</h2>
+    </div>
+  );
+}
+
 export default function Game() {
   const [markers, setMarkers] = useState([]);
   const { charImage, error, loading } = useGetFirstImage();
 
   const [currentPlayer, setCurrentPlayer] = useState({});
   const [gameState, setGameState] = useState(<GameStart />);
+  const [gameMode, setGameMode] = useState("REAL");
 
   if (error) return <ErrorPage errorMsg={error.message} />;
   if (loading) return <LoadingPage />;
@@ -306,6 +320,8 @@ export default function Game() {
         setMarkers,
         currentPlayer,
         setCurrentPlayer,
+        gameMode,
+        setGameMode,
       }}
     >
       {gameState}
