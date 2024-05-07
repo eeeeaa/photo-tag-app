@@ -1,19 +1,24 @@
 import "../styles/App.css";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-
+import { useState } from "react";
 import ErrorPage from "./common/error";
 import Home from "./routes/home";
 import Game from "./routes/game";
 import Leaderboard from "./routes/leaderboard";
 import Navbar from "./common/navbar";
+import { AppContext } from "../utils/contextProvider";
 
 function Content() {
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+
   return (
-    <div className="content">
-      <div className="content-layout">
-        <Outlet />
+    <AppContext.Provider value={{ currentPlayer, setCurrentPlayer }}>
+      <div className="content">
+        <div className="content-layout">
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </AppContext.Provider>
   );
 }
 

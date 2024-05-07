@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { GameContext, MenuContext } from "../../utils/contextProvider";
 import styles from "../../styles/common/contextMenu.module.css";
 import { useNavigate } from "react-router-dom";
-import { GameEnd, PracticeEnd } from "../routes/game";
+import { GameEnd, PracticeEnd } from "../gameState/gameEnd";
 
 ContextMenuItem.propTypes = {
   character: PropTypes.object,
