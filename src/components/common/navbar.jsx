@@ -51,7 +51,7 @@ function MenuSection() {
 function Menu() {
   return (
     <div className={styles["nav-menu-container"]}>
-      <NameLogo title="Scanner" />
+      <NameLogo title="Photo Tag Game" />
       <MenuSection />
     </div>
   );

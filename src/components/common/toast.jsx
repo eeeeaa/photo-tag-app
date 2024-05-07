@@ -5,10 +5,15 @@ import PropTypes from "prop-types";
 Toast.propTypes = {
   message: PropTypes.string,
   setToastMsg: PropTypes.func,
+  isErrorStyle: PropTypes.bool,
 };
 
-export function Toast({ message, setToastMsg }) {
-  const [show, setShow] = useState(`${styles["snackbar"]} ${styles["show"]}`);
+export function Toast({ message, setToastMsg, isErrorStyle = true }) {
+  const [show, setShow] = useState(
+    `${styles["snackbar"]} ${styles["show"]} ${
+      isErrorStyle ? styles["error"] : styles["normal"]
+    }`
+  );
   useEffect(() => {
     setTimeout(() => {
       setShow(`${styles["snackbar"]}`);

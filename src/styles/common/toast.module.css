@@ -13,6 +13,14 @@
   bottom: 30px;
 }
 
+.normal {
+  background-color: #115e59;
+}
+
+.error {
+  background-color: #ef4444;
+}
+
 .snackbar.show {
   visibility: visible;
   animation: fadein 0.3s, fadeout 0.3s 1.2s;

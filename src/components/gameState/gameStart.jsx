@@ -74,7 +74,11 @@ export function GameStart() {
   return (
     <div className={styles["game-layout"]}>
       {toastMsg.length > 0 ? (
-        <Toast message={toastMsg} setToastMsg={setToastMsg} />
+        <Toast
+          message={toastMsg}
+          setToastMsg={setToastMsg}
+          isErrorStyle={false}
+        />
       ) : (
         <></>
       )}
