@@ -58,24 +58,53 @@ function ContextMenuItem({ character }) {
     checkGameEnd(newMarkers);
   };
 
-  const handleMenuClick = async () => {
+  const handleMenuClick = async (selectedChar) => {
     const { character, message, error } = await validatePosition({
       charImageId: charImage._id,
       char_x: normalX,
       char_y: normalY,
     });
+
+    const normalRange = 0.005;
+
+    const inRange = (x, min, max) => {
+      return (x - min) * (x - max) <= 0;
+    };
+
+    //no match found
     if (error != null) {
       navigate("/error");
       return;
     }
-    if (character != null) {
+
+    //found match, check if selected char match
+    if (
+      character != null &&
+      inRange(
+        selectedChar.char_x,
+        character.char_x - normalRange,
+        character.char_x + normalRange
+      ) &&
+      inRange(
+        selectedChar.char_y,
+        character.char_y - normalRange,
+        character.char_y + normalRange
+      )
+    ) {
       placeMarker();
     } else if (message != null) {
       showToast(message);
+    } else {
+      showToast("character not match!");
     }
   };
   return (
-    <li className={styles["context-item"]} onClick={handleMenuClick}>
+    <li
+      className={styles["context-item"]}
+      onClick={() => {
+        handleMenuClick(character);
+      }}
+    >
       <div className={styles["context-item-content"]}>
         <img
           src={character.char_profile_url}
