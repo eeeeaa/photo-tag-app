@@ -1,8 +1,8 @@
-# React + Vite
+# Photo tagging App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Photo taggin game demo web application (Odin Project exercise)
 
-Currently, two official plugins are available:
+# API
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[photo tag api demo](https://photo-tag-game-api.glitch.me/)
+[photo tag api source](https://github.com/eeeeaa/photo-tag-api)
