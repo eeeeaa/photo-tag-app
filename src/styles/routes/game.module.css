@@ -57,7 +57,7 @@
   border-radius: 1em;
   border: 1px solid white;
   opacity: 0.7;
-  transition: transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 
   .char-image-content {
     width: 100%;
@@ -65,6 +65,10 @@
     object-fit: cover;
     border-radius: 1em;
   }
+}
+
+.selected {
+  opacity: 1;
 }
 
 .char-image-item:hover {

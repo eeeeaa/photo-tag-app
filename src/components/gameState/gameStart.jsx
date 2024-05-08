@@ -14,7 +14,21 @@ CharImageItem.propTypes = {
   handleSelectImage: PropTypes.func,
 };
 
-function CharImageItem({ charImage, handleSelectImage }) {
+function CharImageItem({ charImage, selectedChar, handleSelectImage }) {
+  if (selectedChar._id === charImage._id) {
+    return (
+      <div
+        className={`${styles["char-image-item"]} ${styles["selected"]}`}
+        onClick={() => handleSelectImage(charImage)}
+      >
+        <img
+          className={styles["char-image-content"]}
+          src={charImage.image_url}
+          alt={charImage._id}
+        />
+      </div>
+    );
+  }
   return (
     <div
       className={styles["char-image-item"]}
@@ -36,6 +50,7 @@ export function GameStart() {
     setCurrentPlayer,
     setGameMode,
     setCharImage,
+    charImage,
   } = useContext(GameContext);
   const [name, setName] = useState("player");
   const [toastMsg, setToastMsg] = useState("");
@@ -103,6 +118,7 @@ export function GameStart() {
               <CharImageItem
                 key={item._id}
                 charImage={item}
+                selectedChar={charImage}
                 handleSelectImage={handleSelectImage}
               />
             );
